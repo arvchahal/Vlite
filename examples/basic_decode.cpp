@@ -33,7 +33,7 @@ int main() {
         }
     }
 
-    AVCodecParameters* codecpar = fmt_ctx->streams[video_stream_index]->codecpar;
+    const AVCodecParameters* codecpar = fmt_ctx->streams[video_stream_index]->codecpar;
     const AVCodec* codec = avcodec_find_decoder(codecpar->codec_id);
     AVCodecContext* codec_ctx = avcodec_alloc_context3(codec);
     avcodec_parameters_to_context(codec_ctx, codecpar);

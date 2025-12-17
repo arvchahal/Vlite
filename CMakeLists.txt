@@ -14,7 +14,10 @@ pkg_check_modules(LIBAV REQUIRED IMPORTED_TARGET
         libswscale
         libavutil
 )
-add_executable(Vlite main.cpp)
+
+add_executable(Vlite
+        src/vlite-core/video_loader.cpp
+        include/vlite-core/frame.h)
 target_link_libraries(Vlite
         PkgConfig::LIBAV
 )
