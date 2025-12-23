@@ -4,8 +4,16 @@
 #include "../../include/vlite-core/video.h"
 namespace vlite {
     bool Video::load(const char* video_path, AVPixelFormat format) {
-        avformat_network_init();
+        auto vid_name = std::string(video_path);
+        auto start = vid_name.rfind('/');
+        auto end = vid_name.rfind('.');
 
+        if (end == std::string::npos || start == std::string::npos) {
+            std::cerr<< "Major issue our file name i.e .mp4 does not have a . or a /"<<std::endl;
+            return false;
+        }
+        set_name(vid_name.substr(start+1, end-1-start);
+        avformat_network_init();
 
         AVFormatContext *fmt_ctx = nullptr;
         if (avformat_open_input(&fmt_ctx, video_path, nullptr, nullptr) < 0) {

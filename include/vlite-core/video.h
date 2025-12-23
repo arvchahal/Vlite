@@ -27,10 +27,12 @@ class Video {
         Frame &operator[](const size_t index) { return *frames_[index]; }
         size_t size() const { return frames_.size(); }
         bool empty() const { return frames_.empty(); }
+        void set_name(std::string name){video_name= std::move(name);}
         void push_frame(Frame f){frames_.push_back(std::make_shared<Frame>(std::move(f)));}
 
       private:
         std::vector<std::shared_ptr<Frame>> frames_;
+        std::string video_name;
 };
 
 } // namespace vlite
