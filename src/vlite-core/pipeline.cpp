@@ -20,16 +20,17 @@ namespace vlite {
             auto oldWidth  = peek_frame.width, oldHeight = peek_frame.height;
             auto oldFormat = peek_frame.format;
             auto curr = *video;
-            SwsContext *sws_ctx =
+
+            for (auto& frame_ptr: video->get_frames()) {
+                SwsContext *sws_ctx =
                 sws_getContext(oldWidth, oldHeight, AVPixelFormat(oldFormat),
                         newWidth, newHeight, newFormat,
                         SWS_BILINEAR, nullptr, nullptr, nullptr);
-            for (auto& frame_ptr: video->get_frames()) {
                 if (!frame_ptr){
-                    std::cout<<"shared pointer is null in all frames loop"<<std::endl;
+                    std::cout<<"shared pointer is null in all-frames loop"<<std::endl;
                     return false;
                 }
-                Frame frame = *frame_ptr;
+                Frame &frame = *frame_ptr;
                 std::vector<uint8_t> resized_data(newWidth * newHeight * 3);
 
                 // Set up pointers (SwsContext wants arrays)
@@ -45,9 +46,9 @@ namespace vlite {
                 frame.frameData = std::move(resized_data);
                 frame.width = newWidth;
                 frame.height = newHeight;
+                sws_freeContext(sws_ctx);
 
             }
-            sws_freeContext(sws_ctx);
 
         }
         return true;

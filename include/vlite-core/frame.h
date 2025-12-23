@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <ostream>
 #include <vector>
+#include <libavutil/pixfmt.h>
 
 namespace vlite {
 
@@ -14,13 +15,12 @@ struct Frame {
     int width;
     int height;
     int frame_index = -1;                    // Position in video sequence
-    PixelFormat format = PixelFormat::RGB24; //
+    AVPixelFormat format = AV_PIX_FMT_RGB24; //
 };
 
 inline std::ostream &operator<<(std::ostream &os, const Frame &frame) {
     os << "Frame #" << frame.frame_index << " @ " << frame.timestamp
-       << "s: " << frame.width << "x" << frame.height << " ("
-       << (frame.format == PixelFormat::RGB24 ? "RGB24" : "GRAY8") << ")";
+       << "s: " << frame.width << "x" << frame.height;
     return os;
 }
 

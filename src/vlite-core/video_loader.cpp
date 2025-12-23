@@ -17,6 +17,8 @@ int main() {
     auto test = Pipeline();
     bool pass = test.load("../tests/");
     std::cout<< pass;
+    auto resize_p = test.resize(50,50,AV_PIX_FMT_RGB8);
+    std::cout<< resize_p;
     return 0;
 }
 

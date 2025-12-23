@@ -1,7 +1,6 @@
 #pragma once
 
 #include "frame.h"
-#include "types.h"
 #include <iostream>
 #include <vector>
 
@@ -32,7 +31,6 @@ class Video {
 
       private:
         std::vector<std::shared_ptr<Frame>> frames_;
-        VideoMetadata metadata_;
 };
 
 } // namespace vlite

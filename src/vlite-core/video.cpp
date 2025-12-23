@@ -55,7 +55,7 @@ namespace vlite {
         int rgb_linesize[4];
 
         av_image_fill_arrays(rgb_data, rgb_linesize, _buffer.data(),
-                             AV_PIX_FMT_RGB24, codec_ctx->width, codec_ctx->height,
+                             format, codec_ctx->width, codec_ctx->height,
                              1);
 
 
@@ -77,11 +77,6 @@ namespace vlite {
                 }
             }
             av_packet_unref(pkt);
-        }
-
-        for (const auto f : get_frames()) {
-            auto t = *f;
-            std::cout << t << std::endl;
         }
 
         sws_freeContext(sws_ctx);
