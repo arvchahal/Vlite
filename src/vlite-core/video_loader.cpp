@@ -17,9 +17,9 @@ int main() {
     auto test = Pipeline();
     bool pass = test.load("../tests/",AV_PIX_FMT_RGB24);
     std::cout<< pass;
-    // auto resize_p = test.resize(1920,1080,AV_PIX_FMT_RGB24);
-    // std::cout<< resize_p;
-    test[0]->save("../output.mp4");
+    auto resize_p = test.resize(1920,1080,AV_PIX_FMT_GRAY8);
+    std::cout<< resize_p;
+    test.save("../output/",AV_PIX_FMT_RGB24);
     return 0;
 }
 

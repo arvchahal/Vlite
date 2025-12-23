@@ -16,13 +16,12 @@ class Video {
       public:
         Video() = default;
 
-        // Load video from file
+        // load video from file
         bool load(const char *file_path,  AVPixelFormat format);
 
-        // Save video to file
+        // save video to file
         bool save(const char *output_path, AVCodecID codec_id = AV_CODEC_ID_H264, int fps = 30);
 
-        // Access frames
         const std::vector<std::shared_ptr<Frame>> &get_frames() const { return frames_; }
         std::vector<std::shared_ptr<Frame>> &get_frames() { return frames_; }
 
@@ -31,11 +30,13 @@ class Video {
         size_t size() const { return frames_.size(); }
         bool empty() const { return frames_.empty(); }
         void set_name(std::string name){video_name= std::move(name);}
+        std::string get_name(){return video_name;}
         void push_frame(Frame f){frames_.push_back(std::make_shared<Frame>(std::move(f)));}
 
       private:
         std::vector<std::shared_ptr<Frame>> frames_;
         std::string video_name;
+
 };
 
 } // namespace vlite

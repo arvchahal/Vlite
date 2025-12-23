@@ -6,13 +6,13 @@ namespace vlite {
     bool Video::load(const char* video_path, AVPixelFormat format) {
         auto vid_name = std::string(video_path);
         auto start = vid_name.rfind('/');
-        auto end = vid_name.rfind('.');
+        // auto end = vid_name.rfind('.');
 
-        if (end == std::string::npos || start == std::string::npos) {
-            std::cerr<< "Major issue our file name i.e .mp4 does not have a . or a /"<<std::endl;
+        if ( start == std::string::npos) {
+            std::cerr<< "Major issue our file name i.e .mp4 does not have a /"<<std::endl;
             return false;
         }
-        set_name(vid_name.substr(start+1, end-1-start));
+        set_name(vid_name.substr(start+1));
         avformat_network_init();
 
         AVFormatContext *fmt_ctx = nullptr;
@@ -79,6 +79,7 @@ namespace vlite {
                     Frame f;
                     f.width = codec_ctx->width;
                     f.height = codec_ctx->height;
+                    f.format = format;
                     f.frameData = _buffer;
                     // std::cout<<"width: "<<f.width<<" height: "<<f.height<<std::endl;
 
@@ -103,12 +104,10 @@ namespace vlite {
             return false;
         }
 
-        // Get dimensions from first frame
         int width = frames_[0]->width;
         int height = frames_[0]->height;
+        AVPixelFormat input_format = frames_[0]->format;
 
-
-        // Allocate output format context (auto-detects format from extension)
         AVFormatContext* fmt_ctx = nullptr;
         avformat_alloc_output_context2(&fmt_ctx, nullptr, nullptr, output_path);
         if (!fmt_ctx) {
@@ -116,7 +115,7 @@ namespace vlite {
             return false;
         }
 
-        // Find encoder
+        // find encoder
         const AVCodec* codec = avcodec_find_encoder(codec_id);
         if (!codec) {
             std::cerr << "Error: codec not found\n";
@@ -124,7 +123,7 @@ namespace vlite {
             return false;
         }
 
-        // Create video stream
+        // create video stream
         AVStream* stream = avformat_new_stream(fmt_ctx, nullptr);
         if (!stream) {
             std::cerr << "Error: could not create stream\n";
@@ -132,27 +131,25 @@ namespace vlite {
             return false;
         }
 
-        // Allocate encoder context
+        // allocate encoder context
         AVCodecContext* codec_ctx = avcodec_alloc_context3(codec);
         codec_ctx->width = width;
         codec_ctx->height = height;
         codec_ctx->time_base = {1, fps};
         codec_ctx->framerate = {fps, 1};
-        codec_ctx->pix_fmt = AV_PIX_FMT_YUV420P;  // Most codecs support this
+        codec_ctx->pix_fmt = AV_PIX_FMT_YUV420P;  // most optimal yuv idk what other thing to use instead
         codec_ctx->bit_rate = 2000000;
 
-        // Open codec
+        // open codec
         if (avcodec_open2(codec_ctx, codec, nullptr) < 0) {
             std::cerr << "Error: could not open codec\n";
             avcodec_free_context(&codec_ctx);
             avformat_free_context(fmt_ctx);
             return false;
         }
-
-        // Copy codec parameters to stream
+        //idk what this does I think it gets the codec parameters as a stream
         avcodec_parameters_from_context(stream->codecpar, codec_ctx);
 
-        // Open output file
         if (!(fmt_ctx->oformat->flags & AVFMT_NOFILE)) {
             if (avio_open(&fmt_ctx->pb, output_path, AVIO_FLAG_WRITE) < 0) {
                 std::cerr << "Error: could not open output file\n";
@@ -162,17 +159,15 @@ namespace vlite {
             }
         }
 
-        // Write header
         avformat_write_header(fmt_ctx, nullptr);
 
-        // Setup scaler RGB24 -> YUV420P
+
         SwsContext* sws_ctx = sws_getContext(
-            width, height, AV_PIX_FMT_RGB24,
+            width, height, input_format,
             width, height, AV_PIX_FMT_YUV420P,
             SWS_BILINEAR, nullptr, nullptr, nullptr
         );
 
-        // Allocate frame for encoding
         AVFrame* frame = av_frame_alloc();
         frame->format = AV_PIX_FMT_YUV420P;
         frame->width = width;
@@ -181,13 +176,12 @@ namespace vlite {
 
         AVPacket* pkt = av_packet_alloc();
 
-        // Encode each frame
         for (size_t i = 0; i < frames_.size(); i++) {
             auto& f = frames_[i];
 
-            // Convert RGB24 to YUV420P
+            // Convert input format to YUV420P
             const uint8_t* src_data[4] = {f->frameData.data(), nullptr, nullptr, nullptr};
-            int src_linesize[4] = {f->width * 3, 0, 0, 0};
+            int src_linesize[4] = {get_stride(f->width, f->format), 0, 0, 0};
 
             sws_scale(sws_ctx, src_data, src_linesize, 0, f->height,
                       frame->data, frame->linesize);
@@ -208,7 +202,7 @@ namespace vlite {
             }
         }
 
-        // Flush encoder
+        // clean encoder
         avcodec_send_frame(codec_ctx, nullptr);
         while (avcodec_receive_packet(codec_ctx, pkt) == 0) {
             av_packet_rescale_ts(pkt, codec_ctx->time_base, stream->time_base);
@@ -217,10 +211,8 @@ namespace vlite {
             av_packet_unref(pkt);
         }
 
-        // Write trailer
         av_write_trailer(fmt_ctx);
 
-        // Cleanup
         av_packet_free(&pkt);
         av_frame_free(&frame);
         sws_freeContext(sws_ctx);

@@ -20,25 +20,32 @@ namespace vlite {
             auto oldWidth  = peek_frame.width, oldHeight = peek_frame.height;
             auto oldFormat = peek_frame.format;
             auto curr = *video;
-
-            for (auto& frame_ptr: video->get_frames()) {
-                SwsContext *sws_ctx =
-                sws_getContext(oldWidth, oldHeight, AVPixelFormat(oldFormat),
+            SwsContext *sws_ctx =
+                sws_getContext(oldWidth, oldHeight, oldFormat,
                         newWidth, newHeight, newFormat,
                         SWS_BILINEAR, nullptr, nullptr, nullptr);
+            for (auto& frame_ptr: video->get_frames()) {
+
                 if (!frame_ptr){
                     std::cout<<"shared pointer is null in all-frames loop"<<std::endl;
                     return false;
                 }
                 Frame &frame = *frame_ptr;
-                std::vector<uint8_t> resized_data(newWidth * newHeight * 3);
 
-                // Set up pointers (SwsContext wants arrays)
+                int new_bpp = get_bytes_per_pixel(newFormat);
+                if (new_bpp < 0) {
+                    std::cerr << "Unsupported output format in resize\n";
+                    sws_freeContext(sws_ctx);
+                    return false;
+                }
+                std::vector<uint8_t> resized_data(newWidth * newHeight * new_bpp);
+
+                // set up pointers SwsContext wants arrays not vecs
                 const uint8_t* src_data[4] = {frame.frameData.data(), nullptr, nullptr, nullptr};
-                int src_stride[4] = {frame.width * 3, 0, 0, 0};  // RGB24 stride = width * 3
+                int src_stride[4] = {get_stride(frame.width, frame.format), 0, 0, 0};
 
                 uint8_t* dst_data[4] = {resized_data.data(), nullptr, nullptr, nullptr};
-                int dst_stride[4] = {newWidth * 3, 0, 0, 0};
+                int dst_stride[4] = {get_stride(newWidth, newFormat), 0, 0, 0};
 
                 sws_scale(sws_ctx, src_data, src_stride, 0, frame.height,
                           dst_data, dst_stride);
@@ -46,10 +53,10 @@ namespace vlite {
                 frame.frameData = std::move(resized_data);
                 frame.width = newWidth;
                 frame.height = newHeight;
-                sws_freeContext(sws_ctx);
+                frame.format = newFormat;
 
             }
-
+            sws_freeContext(sws_ctx);
         }
         return true;
     }
@@ -75,8 +82,11 @@ namespace vlite {
     }
     bool Pipeline::save(const char* video_dir_path, AVPixelFormat) {
         std::filesystem::create_directory(video_dir_path);
-        for (const auto& vid_ptr: loaded_videos) {
 
+        for (const auto& vid_ptr: loaded_videos) {
+            std::string full_path = std::string(video_dir_path) + vid_ptr->get_name();
+
+            vid_ptr->save(full_path.c_str());
         }
         return true;
     }
