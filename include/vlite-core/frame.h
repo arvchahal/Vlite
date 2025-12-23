@@ -7,7 +7,6 @@
 
 namespace vlite {
 
-enum class PixelFormat : unsigned char { RGB24, GRAY8 };
 
 struct Frame {
     std::vector<uint8_t> frameData;

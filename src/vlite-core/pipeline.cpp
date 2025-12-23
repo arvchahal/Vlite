@@ -54,7 +54,7 @@ namespace vlite {
         return true;
     }
 
-    bool Pipeline::load(const char* video_dir) {
+    bool Pipeline::load(const char* video_dir, AVPixelFormat format) {
         AVFormatContext *fmt_ctx = nullptr;
         for (const auto &video_path : std::filesystem::directory_iterator(video_dir)) {
             //converts the video_path from a directory_entry object to a char*
@@ -62,13 +62,20 @@ namespace vlite {
             const char* path = outfilename_str.c_str();
             Video temp;
 
-            if (!temp.load(path,AV_PIX_FMT_RGB24)) {
+            if (!temp.load(path,format)) {
                 std::cout<< "Failed to load video";
                 return false;
             }
             push_video(std::move(temp));
 
 
+
+        }
+        return true;
+    }
+    bool Pipeline::save(const char* video_dir_path, AVPixelFormat) {
+        std::filesystem::create_directory(video_dir_path);
+        for (const auto& vid_ptr: loaded_videos) {
 
         }
         return true;

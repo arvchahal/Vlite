@@ -19,6 +19,9 @@ class Video {
         // Load video from file
         bool load(const char *file_path,  AVPixelFormat format);
 
+        // Save video to file
+        bool save(const char *output_path, AVCodecID codec_id = AV_CODEC_ID_H264, int fps = 30);
+
         // Access frames
         const std::vector<std::shared_ptr<Frame>> &get_frames() const { return frames_; }
         std::vector<std::shared_ptr<Frame>> &get_frames() { return frames_; }

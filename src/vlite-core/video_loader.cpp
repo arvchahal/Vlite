@@ -15,10 +15,11 @@ using namespace vlite;
 
 int main() {
     auto test = Pipeline();
-    bool pass = test.load("../tests/");
+    bool pass = test.load("../tests/",AV_PIX_FMT_RGB24);
     std::cout<< pass;
-    auto resize_p = test.resize(50,50,AV_PIX_FMT_RGB8);
-    std::cout<< resize_p;
+    // auto resize_p = test.resize(1920,1080,AV_PIX_FMT_RGB24);
+    // std::cout<< resize_p;
+    test[0]->save("../output.mp4");
     return 0;
 }
 
@@ -26,7 +27,7 @@ int main() {
 // int main() {
 //     avformat_network_init();
 //
-//     const char *path = "../tests/video.mp4";
+//     const char *path = "../tests/videohaf.mp4";
 //
 //     AVFormatContext *fmt_ctx = nullptr;
 //     if (avformat_open_input(&fmt_ctx, path, nullptr, nullptr) < 0) {
