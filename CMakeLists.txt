@@ -17,7 +17,11 @@ pkg_check_modules(LIBAV REQUIRED IMPORTED_TARGET
 
 add_executable(Vlite
         src/vlite-core/video_loader.cpp
-        include/vlite-core/frame.h)
+        include/vlite-core/frame.h
+        include/vlite-core/video.h
+        include/vlite-core/pipeline.h
+        src/vlite-core/pipeline.cpp
+        src/vlite-core/video.cpp)
 target_link_libraries(Vlite
         PkgConfig::LIBAV
 )

@@ -1,4 +1,8 @@
 cmake-build-debug
-video.mp4
+tests/video.mp4
 Claude.md
 .idea/
+.clj-kondo
+.lsp
+build
+.DS_Store
