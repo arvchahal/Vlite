@@ -86,10 +86,14 @@ namespace vlite {
         for (const auto& vid_ptr: loaded_videos) {
             std::string full_path = std::string(video_dir_path) + vid_ptr->get_name();
 
-            vid_ptr->save(full_path.c_str());
+            if (!vid_ptr->save(full_path.c_str())) {
+                return false;
+            }
+
         }
         return true;
     }
+
 
 
 }

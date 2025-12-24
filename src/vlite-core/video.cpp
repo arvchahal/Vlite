@@ -98,7 +98,7 @@ namespace vlite {
 
     }
 
-    bool Video::save(const char* output_path, AVCodecID codec_id, int fps) {
+    [[nodiscard]] Video::save(const char* output_path, AVCodecID codec_id, int fps) {
         if (frames_.empty()) {
             std::cerr << "Error: no frames to save\n";
             return false;

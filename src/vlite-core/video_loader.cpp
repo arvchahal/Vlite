@@ -19,7 +19,9 @@ int main() {
     std::cout<< pass;
     auto resize_p = test.resize(1920,1080,AV_PIX_FMT_GRAY8);
     std::cout<< resize_p;
-    test.save("../output/",AV_PIX_FMT_RGB24);
+    if (!test.save("../output/",AV_PIX_FMT_RGB24)) {
+        return -1;
+    }
     return 0;
 }
 
