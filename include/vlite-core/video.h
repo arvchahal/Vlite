@@ -19,17 +19,20 @@ class Video {
       public:
         Video() = default;
         //important shit
-        bool load(const char *file_path,  AVPixelFormat format);
+        [[nodiscard]] bool load(const char *file_path,  AVPixelFormat format);
         [[nodiscard]] bool save(const char *output_path, AVCodecID codec_id = AV_CODEC_ID_H264, int fps = 30);
+        [[nodiscard]] bool load_resize(const char* file_path, AVPixelFormat format, int newWidth, int newHeight);
 
 
 
         //getter-esque methods
-        [[nodiscard]] const std::vector<std::shared_ptr<Frame>> &get_frames() const { return frames_; }
         std::vector<std::shared_ptr<Frame>> &get_frames() { return frames_; }
         std::string get_name(){return video_name;}
+        [[nodiscard]] size_t size() const { return frames_.size(); }
+        [[nodiscard]] bool empty() const { return frames_.empty(); }
         const Frame &operator[](const size_t index) const { return *frames_[index]; }
         Frame &operator[](const size_t index) { return *frames_[index]; }
+
         //setter-esque methods
         void set_name(std::string name){video_name= std::move(name);}
         void push_frame(Frame f){frames_.push_back(std::make_shared<Frame>(std::move(f)));}

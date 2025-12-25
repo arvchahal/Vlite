@@ -15,11 +15,12 @@ using namespace vlite;
 
 int main() {
     auto test = Pipeline();
-    bool pass = test.load("../tests/",AV_PIX_FMT_RGB24);
-    std::cout<< pass;
-    auto resize_p = test.resize(1920,1080,AV_PIX_FMT_GRAY8);
+    // bool pass = test.load("../tests/",AV_PIX_FMT_RGB24);
+    // std::cout<< pass;
+    auto resize_p = test.load_resize("../tests/",1080,1080,AV_PIX_FMT_GRAY8);
     std::cout<< resize_p;
-    if (!test.save("../output/",AV_PIX_FMT_RGB24)) {
+    bool saved = test.save("../output/",AV_PIX_FMT_RGB24);
+    if (!saved) {
         return -1;
     }
     return 0;

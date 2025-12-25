@@ -80,6 +80,21 @@ namespace vlite {
         }
         return true;
     }
+
+    bool Pipeline::load_resize(const char *video_dirpath, int newWidth, int newHeight, AVPixelFormat newFormat) {
+
+        for (const auto& dir_obj:std::filesystem::directory_iterator(video_dirpath)) {
+            const char * vid_path = dir_obj.path().c_str();
+            Video video;
+            if(!video.load_resize(vid_path,newFormat,newWidth,newHeight)) {
+                std::cerr<<"Error loading video from video path: "<<vid_path<<std::endl;
+                return false;
+            }
+            push_video(std::move(video));
+        }
+        return true;
+    }
+
     bool Pipeline::save(const char* video_dir_path, AVPixelFormat) {
         std::filesystem::create_directory(video_dir_path);
 
@@ -93,6 +108,7 @@ namespace vlite {
         }
         return true;
     }
+
 
 
 

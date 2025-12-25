@@ -4,8 +4,8 @@
 #include "../../include/vlite-core/video.h"
 namespace vlite {
     bool Video::load(const char* video_path, AVPixelFormat format) {
-        auto vid_name = std::string(video_path);
-        auto start = vid_name.rfind('/');
+        const auto vid_name = std::string(video_path);
+        const auto start = vid_name.rfind('/');
         // auto end = vid_name.rfind('.');
 
         if ( start == std::string::npos) {
@@ -59,10 +59,10 @@ namespace vlite {
 
         std::vector<uint8_t> _buffer(_buffer_size);
 
-        uint8_t *rgb_data[4];
-        int rgb_linesize[4];
+        uint8_t *data[4];
+        int linesize[4];
 
-        av_image_fill_arrays(rgb_data, rgb_linesize, _buffer.data(),
+        av_image_fill_arrays(data, linesize, _buffer.data(),
                              format, codec_ctx->width, codec_ctx->height,
                              1);
 
@@ -74,7 +74,7 @@ namespace vlite {
                 while (avcodec_receive_frame(codec_ctx, frame) == 0) {
 
                     sws_scale(sws_ctx, frame->data, frame->linesize, 0,
-                              codec_ctx->height, rgb_data, rgb_linesize);
+                              codec_ctx->height, data, linesize);
 
                     Frame f;
                     f.width = codec_ctx->width;
@@ -98,7 +98,92 @@ namespace vlite {
 
     }
 
-    [[nodiscard]] Video::save(const char* output_path, AVCodecID codec_id, int fps) {
+
+    bool Video::load_resize(const char *file_path, AVPixelFormat format, int newWidth, int newHeight) {
+        const auto vid_name = std::string(file_path);
+        const auto start = vid_name.rfind('/');
+
+        if ( start == std::string::npos) {
+            std::cerr<< "Major issue our file name i.e .mp4 does not have a /"<<std::endl;
+            return false;
+        }
+        set_name(vid_name.substr(start+1));
+        avformat_network_init();
+        AVFormatContext *pfctx = nullptr;
+        // AVFormatContext *pfctx = avformat_alloc_context();
+        if(avformat_open_input(&pfctx,file_path,nullptr,nullptr)<0) {
+            std::cerr << "Unable to open file" << std::endl;
+            return false;
+        }
+        if(avformat_find_stream_info(pfctx, nullptr)<0) {
+            std::cerr << "Couldn't find any streams in this file" << std::endl;
+            return false;
+        }
+        uint32_t vid_idx=-1;
+        for ( uint32_t i =0; i < pfctx->nb_streams; i++) {
+            if (pfctx->streams[i]->codecpar->codec_type==AVMEDIA_TYPE_VIDEO) {
+                vid_idx = i;
+                break;
+            }
+        }
+        if (vid_idx == -1) {
+            std::cerr << "couldn't find a video stream" << std::endl;
+            return false;
+        }
+        AVCodecParameters *codecpar =
+            pfctx->streams[vid_idx]->codecpar;
+        const AVCodec *codec = avcodec_find_decoder(codecpar->codec_id);
+
+        AVCodecContext* codec_context = avcodec_alloc_context3(codec);
+        avcodec_parameters_to_context(codec_context,codecpar);
+        avcodec_open2(codec_context, codec, nullptr);
+
+        AVPacket* pckt = av_packet_alloc();
+        AVFrame* avframe = av_frame_alloc();
+        SwsContext *sws_context = sws_getContext(
+            codec_context->width, codec_context->height,
+            codec_context->pix_fmt, newWidth, newHeight, format,
+            SWS_BILINEAR, nullptr, nullptr, nullptr
+            );
+        int _buffer_size = av_image_get_buffer_size(
+            format, codec_context->width, codec_context->height, 1);
+        int linesize[4];
+        uint8_t* data[4];
+
+        std::vector<uint8_t> buff(_buffer_size);
+
+        av_image_fill_arrays(data, linesize, buff.data(),
+            format, codec_context->width, codec_context->height,
+            1);
+
+        while (av_read_frame(pfctx,pckt) >= 0) {
+            if (pckt->stream_index == vid_idx) {
+                avcodec_send_packet(codec_context,pckt);
+
+                while (avcodec_receive_frame(codec_context,avframe)==0) {
+                    sws_scale(
+                        sws_context,avframe->data, avframe->linesize, 0,
+                        codec_context->height, data, linesize);
+                    Frame f;
+                    f.width = newWidth;
+                    f.height = newHeight;
+                    f.format = format;
+                    f.frameData = buff;
+                    push_frame(std::move(f));
+                }
+            }
+            av_packet_unref(pckt);
+        }
+        sws_freeContext(sws_context);
+        av_frame_free(&avframe);
+        av_packet_free(&pckt);
+        avcodec_free_context(&codec_context);
+        avformat_close_input(&pfctx);
+        return true;
+
+    }
+
+    [[nodiscard]] bool Video::save(const char* output_path, AVCodecID codec_id, int fps) {
         if (frames_.empty()) {
             std::cerr << "Error: no frames to save\n";
             return false;
@@ -159,8 +244,9 @@ namespace vlite {
             }
         }
 
-        avformat_write_header(fmt_ctx, nullptr);
-
+        if( avformat_write_header(fmt_ctx, nullptr)<0) {
+            std::cerr << "Error writing stream header to output file" << std::endl;
+        }
 
         SwsContext* sws_ctx = sws_getContext(
             width, height, input_format,
@@ -225,4 +311,5 @@ namespace vlite {
 
         return true;
     }
+
 }
