@@ -146,14 +146,14 @@ namespace vlite {
             SWS_BILINEAR, nullptr, nullptr, nullptr
             );
         int _buffer_size = av_image_get_buffer_size(
-            format, codec_context->width, codec_context->height, 1);
+            format, newWidth, newHeight, 1);
         int linesize[4];
         uint8_t* data[4];
 
         std::vector<uint8_t> buff(_buffer_size);
 
         av_image_fill_arrays(data, linesize, buff.data(),
-            format, codec_context->width, codec_context->height,
+            format, newWidth, newHeight,
             1);
 
         while (av_read_frame(pfctx,pckt) >= 0) {
