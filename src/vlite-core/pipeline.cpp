@@ -5,7 +5,7 @@ namespace vlite {
 
     }
 
-    bool Pipeline::resize(const int newWidth, const int newHeight, const AVPixelFormat newFormat) const {
+    bool Pipeline::resize(const int newWidth, const int newHeight, const AVPixelFormat newFormat) {
         for (const auto& video: this->loaded_videos) {
             if (!video || video->empty()) {
                 return false;
@@ -16,47 +16,13 @@ namespace vlite {
                 std::cout<<"shared pointer is null in peek frame"<<std::endl;
                 return false;
             }
-            Frame peek_frame = *peek_frame_ptr;
+            const Frame& peek_frame = *peek_frame_ptr;
             auto oldWidth  = peek_frame.width, oldHeight = peek_frame.height;
             auto oldFormat = peek_frame.format;
-            auto curr = *video;
-            SwsContext *sws_ctx =
-                sws_getContext(oldWidth, oldHeight, oldFormat,
-                        newWidth, newHeight, newFormat,
-                        SWS_BILINEAR, nullptr, nullptr, nullptr);
-            for (auto& frame_ptr: video->get_frames()) {
-
-                if (!frame_ptr){
-                    std::cout<<"shared pointer is null in all-frames loop"<<std::endl;
-                    return false;
-                }
-                Frame &frame = *frame_ptr;
-
-                int new_bpp = get_bytes_per_pixel(newFormat);
-                if (new_bpp < 0) {
-                    std::cerr << "Unsupported output format in resize\n";
-                    sws_freeContext(sws_ctx);
-                    return false;
-                }
-                std::vector<uint8_t> resized_data(newWidth * newHeight * new_bpp);
-
-                // set up pointers SwsContext wants arrays not vecs
-                const uint8_t* src_data[4] = {frame.frameData.data(), nullptr, nullptr, nullptr};
-                int src_stride[4] = {get_stride(frame.width, frame.format), 0, 0, 0};
-
-                uint8_t* dst_data[4] = {resized_data.data(), nullptr, nullptr, nullptr};
-                int dst_stride[4] = {get_stride(newWidth, newFormat), 0, 0, 0};
-
-                sws_scale(sws_ctx, src_data, src_stride, 0, frame.height,
-                          dst_data, dst_stride);
-
-                frame.frameData = std::move(resized_data);
-                frame.width = newWidth;
-                frame.height = newHeight;
-                frame.format = newFormat;
-
+            if (!video->resize( oldFormat, oldWidth, oldHeight, newFormat, newWidth, newHeight)) {
+                std::cout << "Failed to resize video" << std::endl;
+                return false;
             }
-            sws_freeContext(sws_ctx);
         }
         return true;
     }
@@ -82,6 +48,11 @@ namespace vlite {
     }
 
     bool Pipeline::load_resize(const char *video_dirpath, int newWidth, int newHeight, AVPixelFormat newFormat) {
+        int new_bpp = get_bytes_per_pixel(newFormat);
+        if (new_bpp < 0) {
+            std::cerr << "Unsupported output format in resize\n";
+            return false;
+        }
 
         for (const auto& dir_obj:std::filesystem::directory_iterator(video_dirpath)) {
             const char * vid_path = dir_obj.path().c_str();

@@ -22,6 +22,8 @@ class Video {
         [[nodiscard]] bool load(const char *file_path,  AVPixelFormat format);
         [[nodiscard]] bool save(const char *output_path, AVCodecID codec_id = AV_CODEC_ID_H264, int fps = 30);
         [[nodiscard]] bool load_resize(const char* file_path, AVPixelFormat format, int newWidth, int newHeight);
+        [[nodiscard]] bool resize(AVPixelFormat oldFormat, int oldWidth, int oldHeight, AVPixelFormat newFormat,
+            int newWidth, int newHeight);
 
 
 

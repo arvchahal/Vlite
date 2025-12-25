@@ -183,7 +183,51 @@ namespace vlite {
 
     }
 
-    [[nodiscard]] bool Video::save(const char* output_path, AVCodecID codec_id, int fps) {
+    bool Video::resize(AVPixelFormat oldFormat,  int oldWidth, int oldHeight, AVPixelFormat newFormat,
+        int newWidth, int newHeight) {
+        SwsContext *sws_ctx =
+            sws_getContext(oldWidth, oldHeight, oldFormat,
+                    newWidth, newHeight, newFormat,
+                    SWS_BILINEAR, nullptr, nullptr, nullptr);
+        for (auto& frame_ptr: get_frames()) {
+
+            if (!frame_ptr){
+                std::cout<<"shared pointer is null in all-frames loop"<<std::endl;
+                return false;
+            }
+            Frame &frame = *frame_ptr;
+
+            int new_bpp = get_bytes_per_pixel(newFormat);
+            if (new_bpp < 0) {
+                std::cerr << "Unsupported output format in resize\n";
+                sws_freeContext(sws_ctx);
+                return false;
+            }
+            std::vector<uint8_t> resized_data(newWidth * newHeight * new_bpp);
+
+            // set up pointers SwsContext wants arrays not vecs
+            const uint8_t* src_data[4] = {frame.frameData.data(), nullptr, nullptr, nullptr};
+            int src_stride[4] = {get_stride(frame.width, frame.format), 0, 0, 0};
+
+            uint8_t* dst_data[4] = {resized_data.data(), nullptr, nullptr, nullptr};
+            int dst_stride[4] = {get_stride(newWidth, newFormat), 0, 0, 0};
+
+            sws_scale(sws_ctx, src_data, src_stride, 0, frame.height,
+                      dst_data, dst_stride);
+
+            frame.frameData = std::move(resized_data);
+            frame.width = newWidth;
+            frame.height = newHeight;
+            frame.format = newFormat;
+
+        }
+        sws_freeContext(sws_ctx);
+        return true;
+    }
+
+
+
+    bool Video::save(const char* output_path, AVCodecID codec_id, int fps) {
         if (frames_.empty()) {
             std::cerr << "Error: no frames to save\n";
             return false;

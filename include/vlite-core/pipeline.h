@@ -17,7 +17,7 @@ namespace vlite {
   public:
     Pipeline() = default;
     explicit Pipeline(const std::string &videos_path);
-    [[nodiscard]] bool resize(int newWidth, int newHeight, AVPixelFormat newFormat) const;
+    [[nodiscard]] bool resize(int newWidth, int newHeight, AVPixelFormat newFormat);
     [[nodiscard]] bool load(const char* video_dirpath, AVPixelFormat format);
     [[nodiscard]] bool load_resize( const char *video_dirpath, int newWidth, int newHeight, AVPixelFormat newFormat);
     [[nodiscard]] bool save(const char* video_dir_path, AVPixelFormat format);
