@@ -21,7 +21,13 @@ add_executable(Vlite
         include/vlite-core/video.h
         include/vlite-core/pipeline.h
         src/vlite-core/pipeline.cpp
-        src/vlite-core/video.cpp)
+        src/vlite-core/video.cpp
+        include/vlite-sampling/sampler.h
+        include/vlite-sampling/uniform.h
+        include/vlite-sampling/random.h
+        include/vlite-sampling/temporal.h
+        include/vlite-ml/tensor.h
+        src/vlite-sampling/uniform.cpp)
 target_link_libraries(Vlite
         PkgConfig::LIBAV
 )

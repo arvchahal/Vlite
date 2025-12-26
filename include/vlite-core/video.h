@@ -29,6 +29,9 @@ class Video {
 
         //getter-esque methods
         std::vector<std::shared_ptr<Frame>> &get_frames() { return frames_; }
+        // std::vector<std::shared_ptr<Frame>> &get_frames() const { return  std::vector<std::shared_ptr<Frame>>{frames_.begin(),frames_.end()};
+
+        // std::vector<std::shared_ptr<Frame>> get_frames() { return const_cast<std::vector<std::shared_ptr<Frame>>>(frames_); }
         std::string get_name(){return video_name;}
         [[nodiscard]] size_t size() const { return frames_.size(); }
         [[nodiscard]] bool empty() const { return frames_.empty(); }
