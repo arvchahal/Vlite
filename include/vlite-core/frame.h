@@ -9,7 +9,7 @@
 namespace vlite {
     struct Frame {
         std::vector<uint8_t> frameData;
-        double timestamp = 0.0; // Time in seconds
+        double timestamp = 0.0;
         int width;
         int height;
         int frame_index = -1; // Position in video sequence

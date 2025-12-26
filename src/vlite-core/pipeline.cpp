@@ -19,7 +19,7 @@ namespace vlite {
             const Frame& peek_frame = *peek_frame_ptr;
             auto oldWidth  = peek_frame.width, oldHeight = peek_frame.height;
             auto oldFormat = peek_frame.format;
-            if (!video->resize( oldFormat, oldWidth, oldHeight, newFormat, newWidth, newHeight)) {
+            if (!video->resize(oldFormat, oldWidth, oldHeight, newFormat, newWidth, newHeight)) {
                 std::cout << "Failed to resize video" << std::endl;
                 return false;
             }
@@ -79,8 +79,5 @@ namespace vlite {
         }
         return true;
     }
-
-
-
 
 }

@@ -65,8 +65,8 @@ namespace vlite {
         av_image_fill_arrays(data, linesize, _buffer.data(),
                              format, codec_ctx->width, codec_ctx->height,
                              1);
-
-
+        int frame_idx = 0;
+        auto time_base = fmt_ctx->streams[video_stream_index]->time_base;
         while (av_read_frame(fmt_ctx, pkt) >= 0) {
             if (pkt->stream_index == video_stream_index) {
                 avcodec_send_packet(codec_ctx, pkt);
@@ -75,16 +75,20 @@ namespace vlite {
 
                     sws_scale(sws_ctx, frame->data, frame->linesize, 0,
                               codec_ctx->height, data, linesize);
+                    auto time_stmp = frame->best_effort_timestamp;
 
                     Frame f;
                     f.width = codec_ctx->width;
                     f.height = codec_ctx->height;
                     f.format = format;
                     f.frameData = _buffer;
-                    // std::cout<<"width: "<<f.width<<" height: "<<f.height<<std::endl;
+                    f.frame_index = frame_idx;
+                    f.timestamp = time_stmp * av_q2d(time_base);
+                    // std::cout<<"frame: "<<f<<std::endl;
 
                     push_frame(std::move(f));
                 }
+                frame_idx+=1;
             }
             av_packet_unref(pkt);
         }
@@ -155,7 +159,8 @@ namespace vlite {
         av_image_fill_arrays(data, linesize, buff.data(),
             format, newWidth, newHeight,
             1);
-
+        size_t frame_idx = 0;
+        auto time_base = pfctx->streams[vid_idx]->time_base;
         while (av_read_frame(pfctx,pckt) >= 0) {
             if (pckt->stream_index == vid_idx) {
                 avcodec_send_packet(codec_context,pckt);
@@ -164,13 +169,21 @@ namespace vlite {
                     sws_scale(
                         sws_context,avframe->data, avframe->linesize, 0,
                         codec_context->height, data, linesize);
+                    //timestamp expressed in seconds
+                    auto time_stmp = avframe->best_effort_timestamp;
+
                     Frame f;
                     f.width = newWidth;
                     f.height = newHeight;
                     f.format = format;
                     f.frameData = buff;
+                    f.frame_index = frame_idx;
+                    f.timestamp = time_stmp * av_q2d(time_base);
+                    // std::cout << "Curr frame: " << f << std::endl;
                     push_frame(std::move(f));
+
                 }
+                frame_idx+=1;
             }
             av_packet_unref(pckt);
         }
