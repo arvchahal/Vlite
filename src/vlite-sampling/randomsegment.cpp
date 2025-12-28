@@ -8,11 +8,6 @@ namespace vlite {
     Random_Segment_Sampler::Random_Segment_Sampler(int seed) : rng_(seed){
     }
 
-    std::vector<std::shared_ptr<Clip>> sample_frames(...) override {
-        std::cerr << "Timestamp_Sampler doesn't support sample_frames" << std::endl;
-        return {};
-    }
-
     std::vector<std::shared_ptr<Clip>> Random_Segment_Sampler::sample_frames(Video *vid,
         int num_clips, int frames_per_clip) {
         std::vector<std::shared_ptr<Clip>> all_clips;

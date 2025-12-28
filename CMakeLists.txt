@@ -15,12 +15,18 @@ pkg_check_modules(LIBAV REQUIRED IMPORTED_TARGET
 file(GLOB CORE_SOURCES "src/vlite-core/*.cpp")
 file(GLOB SAMPLING_SOURCES "src/vlite-sampling/*.cpp")
 
+# Exclude video_loader.cpp (it has main) from library
+list(REMOVE_ITEM CORE_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/vlite-core/video_loader.cpp")
+
 # Build the Vlite library
 add_library(vlite STATIC
     ${CORE_SOURCES}
     ${SAMPLING_SOURCES}
-        include/vlite-sampling/sampler.h
 )
+
+# Build test executable
+add_executable(vlite-test src/vlite-core/video_loader.cpp)
+target_link_libraries(vlite-test vlite)
 
 # Include directories for the library
 target_include_directories(vlite

@@ -5,6 +5,7 @@
 #ifndef TEMPORAL_H
 #define TEMPORAL_H
 #include "./sampler.h"
+#include <cmath>
 namespace vlite {
     class Timestamp_Sampler : Sampler{
         Timestamp_Sampler()= default;

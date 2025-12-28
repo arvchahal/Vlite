@@ -2,7 +2,6 @@
 // Created by Arnav Chahal on 12/28/25.
 //
 #include "../../include/vlite-sampling/temporal.h"
-#include <cmath>
 namespace vlite {
     std::shared_ptr<Frame> Timestamp_Sampler::sample_frame(Video *vid, double target_seconds) {
         if (target_seconds < 0) {
