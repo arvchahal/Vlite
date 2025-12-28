@@ -1,34 +1,33 @@
 cmake_minimum_required(VERSION 3.28)
-project(Vlite)
+project(Vlite VERSION 0.1.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Find FFmpeg libraries
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(LIBAV REQUIRED IMPORTED_TARGET
-        libavdevice
-        libavfilter
-        libavformat
-        libavcodec
-        libswresample
-        libswscale
-        libavutil
+    libavdevice libavfilter libavformat libavcodec
+    libswresample libswscale libavutil
 )
 
-add_executable(Vlite
-        src/vlite-core/video_loader.cpp
-        include/vlite-core/frame.h
-        include/vlite-core/video.h
-        include/vlite-core/pipeline.h
-        src/vlite-core/pipeline.cpp
-        src/vlite-core/video.cpp
+# Collect source files by component
+file(GLOB CORE_SOURCES "src/vlite-core/*.cpp")
+file(GLOB SAMPLING_SOURCES "src/vlite-sampling/*.cpp")
+
+# Build the Vlite library
+add_library(vlite STATIC
+    ${CORE_SOURCES}
+    ${SAMPLING_SOURCES}
         include/vlite-sampling/sampler.h
-        include/vlite-sampling/uniform.h
-        include/vlite-sampling/random.h
-        include/vlite-sampling/temporal.h
-        include/vlite-ml/tensor.h
-        src/vlite-sampling/uniform.cpp
-        src/vlite-sampling/random.cpp)
-target_link_libraries(Vlite
-        PkgConfig::LIBAV
 )
+
+# Include directories for the library
+target_include_directories(vlite
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+)
+
+# Link FFmpeg to the library
+target_link_libraries(vlite PUBLIC PkgConfig::LIBAV)

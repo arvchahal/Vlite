@@ -20,8 +20,8 @@ inline std::ostream &operator<<(std::ostream &os, const Clip &c) {
 
 class Sampler {
 public:
-  virtual std::vector<std::shared_ptr<Clip>>
-  sample_frames(Video *vid, int num_clips, int frames_per_clip) = 0;
+  virtual std::vector<std::shared_ptr<Clip>> sample_frames(Video *vid, int num_clips, int frames_per_clip) = 0;
+  std::shared_ptr<Frame> sample_frame(Video *vid,double seconds =-1);
   virtual ~Sampler() = default;
 
 protected:

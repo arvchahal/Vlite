@@ -15,6 +15,7 @@ namespace vlite {
 class Video {
     //private vars
     std::vector<std::shared_ptr<Frame>> frames_;
+    int64_t video_length; //in seconds
     std::string video_name;
       public:
         Video() = default;
@@ -29,6 +30,7 @@ class Video {
 
         //getter-esque methods
         std::vector<std::shared_ptr<Frame>> &get_frames() { return frames_; }
+        [[nodiscard]] int64_t get_video_length() const{return video_length;}
         // std::vector<std::shared_ptr<Frame>> &get_frames() const { return  std::vector<std::shared_ptr<Frame>>{frames_.begin(),frames_.end()};
 
         // std::vector<std::shared_ptr<Frame>> get_frames() { return const_cast<std::vector<std::shared_ptr<Frame>>>(frames_); }
@@ -40,6 +42,7 @@ class Video {
 
         //setter-esque methods
         void set_name(std::string name){video_name= std::move(name);}
+        void set_vid_length(const int64_t length){video_length=length;}
         void push_frame(Frame f){frames_.push_back(std::make_shared<Frame>(std::move(f)));}
 
 

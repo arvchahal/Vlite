@@ -25,6 +25,7 @@ namespace vlite {
             std::cerr << "Error: could not retrieve stream info\n";
             return false;
         }
+        set_vid_length(fmt_ctx->duration);
 
         int video_stream_index = -1;
         for (uint32_t i = 0; i < fmt_ctx->nb_streams; i++) {
@@ -123,6 +124,7 @@ namespace vlite {
             std::cerr << "Couldn't find any streams in this file" << std::endl;
             return false;
         }
+        set_vid_length(pfctx->duration);
         uint32_t vid_idx=-1;
         for ( uint32_t i =0; i < pfctx->nb_streams; i++) {
             if (pfctx->streams[i]->codecpar->codec_type==AVMEDIA_TYPE_VIDEO) {
