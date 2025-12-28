@@ -6,11 +6,18 @@
 #define SAMPLER_H
 #include "../vlite-core/frame.h"
 #include "../vlite-core/video.h"
+#include <cmath>
 namespace vlite {
 /// frames in sequential order
 struct Clip {
+public:
   std::vector<std::shared_ptr<Frame>> frames;
 };
+inline std::ostream &operator<<(std::ostream &os, const Clip &c) {
+  std::cout << "Frames in this clip" << &c.frames << std::endl;
+  return os;
+}
+
 class Sampler {
 public:
   virtual std::vector<std::shared_ptr<Clip>>
@@ -18,7 +25,7 @@ public:
   virtual ~Sampler() = default;
 
 protected:
-  Sampler();
+  Sampler() = default;
 };
 } // namespace vlite
 #endif // SAMPLER_H

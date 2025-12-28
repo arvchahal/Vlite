@@ -1,7 +1,6 @@
 #include <filesystem>
 #include <iostream>
 #include <vector>
-
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avformat.h>
@@ -10,22 +9,30 @@ extern "C" {
 }
 
 #include "../../include/vlite-core/pipeline.h"
-
+#include "../../include/vlite-sampling/uniform.h"
 using namespace vlite;
 
 int main() {
     auto test = Pipeline();
-    bool pass = test.load("../tests/",AV_PIX_FMT_RGB24);
-    std::cout<< pass;
-    // auto resize_p = test.load_resize("../tests/",1080,1080,AV_PIX_FMT_GRAY8);
-    // std::cout<< resize_p;
-    // bool saved = test.save("../output/",AV_PIX_FMT_RGB24);
-    // if (!saved) {
+    bool pass = test.load("../tests/", AV_PIX_FMT_RGB24);
+    Uniform_Spacing_Sampler unif;
+    auto samples =
+        unif.sample_frames(test.get_videos()[0].get(), 5, 100);
+    // for (auto &x : samples) {
+    //     auto i{0};
+    //     for (auto &u : x->frames) {
+    //         std::cout << "Frame: "<< i<< " data: " << u->width << std::endl;
+    //         i+=1;
+    //     }
+    // }
+    // auto resize_p =
+    // test.load_resize("../tests/",1080,1080,AV_PIX_FMT_GRAY8); std::cout<<
+    // resize_p; bool saved = test.save("../output/",AV_PIX_FMT_RGB24); if
+    // (!saved) {
     //     return -1;
     // }
     return 0;
 }
-
 
 // int main() {
 //     avformat_network_init();
@@ -45,7 +52,8 @@ int main() {
 //
 //     int video_stream_index = -1;
 //     for (uint32_t i = 0; i < fmt_ctx->nb_streams; i++) {
-//         if (fmt_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO) {
+//         if (fmt_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_VIDEO)
+//         {
 //             video_stream_index = i;
 //             break;
 //         }
@@ -67,7 +75,8 @@ int main() {
 //     AVFrame *frame = av_frame_alloc();
 //
 //     SwsContext *sws_ctx =
-//         sws_getContext(codec_ctx->width, codec_ctx->height, codec_ctx->pix_fmt,
+//         sws_getContext(codec_ctx->width, codec_ctx->height,
+//         codec_ctx->pix_fmt,
 //                        codec_ctx->width, codec_ctx->height, AV_PIX_FMT_RGB24,
 //                        SWS_BILINEAR, nullptr, nullptr, nullptr);
 //
@@ -80,8 +89,8 @@ int main() {
 //     int rgb_linesize[4];
 //
 //     av_image_fill_arrays(rgb_data, rgb_linesize, rgb_buffer.data(),
-//                          AV_PIX_FMT_RGB24, codec_ctx->width, codec_ctx->height,
-//                          1);
+//                          AV_PIX_FMT_RGB24, codec_ctx->width,
+//                          codec_ctx->height, 1);
 //
 //     vector<Frame> all_frames;
 //
