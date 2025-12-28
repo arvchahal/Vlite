@@ -17,10 +17,6 @@ Uniform_Spacing_Sampler::sample_frames(Video *vid, int num_clips,
     //max frames per clip
     int max_fpc = std::ceil(double(_num_frames) / double(num_clips));
     std:: cout << "max frames per clip: " <<max_fpc << std::endl;
-    int offset = 0;
-    if (max_fpc > frames_per_clip) {
-        offset = (max_fpc - frames_per_clip) /2;
-    }
     // int inc = _num_frames / num_chunks;
     int end_chunk = max_fpc;
     int beg_chunk = 0;

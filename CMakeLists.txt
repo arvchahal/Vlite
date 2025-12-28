@@ -27,7 +27,8 @@ add_executable(Vlite
         include/vlite-sampling/random.h
         include/vlite-sampling/temporal.h
         include/vlite-ml/tensor.h
-        src/vlite-sampling/uniform.cpp)
+        src/vlite-sampling/uniform.cpp
+        src/vlite-sampling/random.cpp)
 target_link_libraries(Vlite
         PkgConfig::LIBAV
 )
