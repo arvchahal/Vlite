@@ -13,7 +13,6 @@ struct Clip {
 public:
   std::vector<std::shared_ptr<Frame>> frames;
 };
-
 inline std::ostream &operator<<(std::ostream &os, const Clip &c) {
   std::cout << "Frames in this clip" << &c.frames << std::endl;
   return os;
