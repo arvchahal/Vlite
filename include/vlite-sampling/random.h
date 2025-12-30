@@ -8,7 +8,7 @@
 #include <random>
 #include <chrono>
 namespace vlite {
-    class Random_Frame_Sampler : Sampler{
+    class Random_Frame_Sampler : public Sampler{
         std::mt19937 rng_;  // rand generator
     public:
         Random_Frame_Sampler();

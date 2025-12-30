@@ -11,7 +11,7 @@ namespace vlite {
 /// desired numnber of clips but with max frames per clips and likely not
 /// uniformly spaced unless we are somehow lucky and num_frames / num_clips ==
 /// int
-class Uniform_Spacing_Sampler : Sampler {
+class Uniform_Spacing_Sampler : public Sampler {
 public:
   Uniform_Spacing_Sampler() = default;
   std::vector<std::shared_ptr<Clip>>

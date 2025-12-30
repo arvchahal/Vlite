@@ -29,4 +29,9 @@ namespace vlite {
 
     }
 
+    std::vector<std::shared_ptr<Clip>> Timestamp_Sampler::sample_frames(Video *vid, int num_clips, int frames_per_clip) {
+        std::cerr << "Timestamp_Sampler does not support multi-clip sampling. Use sample_frame() instead." << std::endl;
+        return {};
+    }
+
 }

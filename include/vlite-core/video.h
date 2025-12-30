@@ -31,6 +31,7 @@ class Video {
 
         //getter-esque methods
         std::vector<std::shared_ptr<Frame>> &get_frames() { return frames_; }
+        const std::vector<std::shared_ptr<Frame>> &get_frames() const { return frames_; }
         [[nodiscard]] int64_t get_video_length() const{return video_length;}
         // std::vector<std::shared_ptr<Frame>> &get_frames() const { return  std::vector<std::shared_ptr<Frame>>{frames_.begin(),frames_.end()};
 

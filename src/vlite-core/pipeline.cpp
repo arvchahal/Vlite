@@ -1,4 +1,6 @@
 #include "../../include/vlite-core/pipeline.h"
+#include "../../include/vlite-sampling/sampler.h"
+#include "../../include/vlite-tensor/tensor.h"
 
 namespace vlite {
     Pipeline::Pipeline(const std::string &video_path) {
@@ -78,6 +80,34 @@ namespace vlite {
 
         }
         return true;
+    }
+
+    std::vector<torch::Tensor> Pipeline::sample_all(Sampler* sampler, int num_clips,
+                                                     int frames_per_clip, bool normalize) {
+        std::vector<torch::Tensor> result;
+        result.reserve(loaded_videos.size());
+
+        for (const auto& video : loaded_videos) {
+            if (!video || video->empty()) {
+                std::cerr << "Warning: Skipping empty or null video in pipeline sampling" << std::endl;
+                continue;
+            }
+
+            // Sample clips from this video
+            auto clips = sampler->sample_frames(video.get(), num_clips, frames_per_clip);
+
+            if (clips.empty()) {
+                std::cerr << "Warning: Sampler returned no clips for video: "
+                          << video->get_name() << std::endl;
+                continue;
+            }
+
+            // Convert clips to tensor and add to result
+            torch::Tensor video_tensor = clips_to_tensor(clips, normalize);
+            result.push_back(video_tensor);
+        }
+
+        return result;
     }
 
 }
