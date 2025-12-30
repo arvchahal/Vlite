@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Find LibTorch
-set(CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/libtorch")
+set(CMAKE_PREFIX_PATH "$ENV{HOME}/libs/libtorch")
 find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
@@ -31,6 +31,15 @@ add_library(vlite STATIC
         ${SAMPLING_SOURCES}
         include/vlite-tensor/tensor.h
         src/vlite-tensor/tensor.cpp
+        tests/vlite-core-tests/pipeline-tests.cpp
+        tests/vlite-core-tests/video-tests.cpp
+        tests/vlite-core-tests/frame-tests.cpp
+        tests/vlite-sampling-tests/temporal-tests.cpp
+        tests/vlite-sampling-tests/uniform-tests.cpp
+        tests/vlite-sampling-tests/random-tests.cpp
+        tests/vlite-sampling-tests/random-segment-tests.cpp
+        tests/vlite-sampling-tests/sampler-tests.cpp
+        tests/vlite-tensor-tests/tensor-tests.cpp
 )
 
 # Build test executable
@@ -50,3 +59,20 @@ target_link_libraries(vlite PUBLIC
         PkgConfig::LIBAV
         ${TORCH_LIBRARIES}
 )
+
+# Python bindings with pybind11
+find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
+add_subdirectory($ENV{HOME}/libs/pybind11)
+
+pybind11_add_module(vlite_python
+    vlite-pybind/main.cpp
+    vlite-pybind/vlite-core.cpp
+    vlite-pybind/vlite-sampling.cpp
+    vlite-pybind/vlite-tensor.cpp
+)
+
+target_link_libraries(vlite_python PRIVATE vlite)
+set_target_properties(vlite_python PROPERTIES OUTPUT_NAME vlite)
+
+# Add tests subdirectory
+add_subdirectory(tests)
