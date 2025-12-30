@@ -31,15 +31,6 @@ add_library(vlite STATIC
         ${SAMPLING_SOURCES}
         include/vlite-tensor/tensor.h
         src/vlite-tensor/tensor.cpp
-        tests/vlite-core-tests/pipeline-tests.cpp
-        tests/vlite-core-tests/video-tests.cpp
-        tests/vlite-core-tests/frame-tests.cpp
-        tests/vlite-sampling-tests/temporal-tests.cpp
-        tests/vlite-sampling-tests/uniform-tests.cpp
-        tests/vlite-sampling-tests/random-tests.cpp
-        tests/vlite-sampling-tests/random-segment-tests.cpp
-        tests/vlite-sampling-tests/sampler-tests.cpp
-        tests/vlite-tensor-tests/tensor-tests.cpp
 )
 
 # Build test executable
@@ -74,5 +65,32 @@ pybind11_add_module(vlite_python
 target_link_libraries(vlite_python PRIVATE vlite)
 set_target_properties(vlite_python PROPERTIES OUTPUT_NAME vlite)
 
-# Add tests subdirectory
-add_subdirectory(tests)
+# ============================================================================
+# Google Test Setup
+# ============================================================================
+include(FetchContent)
+FetchContent_Declare(
+  googletest
+  GIT_REPOSITORY https://github.com/google/googletest.git
+  GIT_TAG v1.14.0
+)
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
+
+enable_testing()
+
+# Collect all test files
+file(GLOB_RECURSE TEST_SOURCES "tests/*-tests/*.cpp")
+
+# Build test executable
+add_executable(vlite_tests ${TEST_SOURCES})
+
+target_link_libraries(vlite_tests
+    gtest
+    gtest_main
+    vlite
+)
+
+# Auto-discover tests
+include(GoogleTest)
+gtest_discover_tests(vlite_tests)
