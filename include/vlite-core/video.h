@@ -19,6 +19,7 @@ class Video {
     std::string video_name;
       public:
         Video() = default;
+        Video(std::vector<std::shared_ptr<Frame>> frames);
         //important shit
         [[nodiscard]] bool load(const char *file_path,  AVPixelFormat format);
         [[nodiscard]] bool save(const char *output_path, AVCodecID codec_id = AV_CODEC_ID_H264, int fps = 30);

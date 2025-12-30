@@ -13,7 +13,7 @@ extern "C" {
 }
 namespace vlite {
 class Pipeline {
-  std::vector<std::shared_ptr<Video>> loaded_videos;
+  std::vector<std::unique_ptr<Video>> loaded_videos;
 
 public:
   Pipeline() = default;
@@ -26,9 +26,8 @@ public:
   [[nodiscard]] bool save(const char *video_dir_path, AVPixelFormat format);
 
   void push_video(Video vid) {
-    loaded_videos.push_back(std::make_shared<Video>(std::move(vid)));
+    loaded_videos.push_back(std::make_unique<Video>(std::move(vid)));
   }
-  std::shared_ptr<Video> operator[](int index) { return loaded_videos[index]; }
-  std::vector<std::shared_ptr<Video>> get_videos() { return loaded_videos; }
+  std::vector<std::unique_ptr<Video>>& get_videos() { return loaded_videos; }
 };
 } // namespace vlite

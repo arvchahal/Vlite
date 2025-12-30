@@ -13,11 +13,25 @@ extern "C" {
 using namespace vlite;
 
 int main() {
-    auto test = Pipeline();
-    bool pass = test.load("../tests/", AV_PIX_FMT_RGB24);
-    Uniform_Spacing_Sampler unif;
-    auto samples =
-        unif.sample_frames(test.get_videos()[0].get(), 5, 100);
+    // auto test = Pipeline();
+    // bool pass = test.load("../tests/", AV_PIX_FMT_RGB24);
+    // Uniform_Spacing_Sampler unif;
+    // auto samples =
+    //     unif.sample_frames(test.get_videos()[0].get(), 5, 100);
+    std::vector<uint8_t> data = {23,23,12,213,198};
+    uint8_t *ptr = data.data();
+    auto p = std::make_unique<uint8_t>(std::move(*ptr));
+    data = std::vector<uint8_t>();
+
+
+
+    std::cout<<*ptr<<std::endl;
+    std::cout<<*p<<std::endl;
+
+
+
+
+
     // for (auto &x : samples) {
     //     auto i{0};
     //     for (auto &u : x->frames) {
