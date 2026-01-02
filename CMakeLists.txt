@@ -53,7 +53,7 @@ target_link_libraries(vlite PUBLIC
 
 # Python bindings with pybind11
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
-add_subdirectory($ENV{HOME}/libs/pybind11)
+add_subdirectory($ENV{HOME}/libs/pybind11 ${CMAKE_BINARY_DIR}/pybind11)
 
 pybind11_add_module(vlite_python
     vlite-pybind/main.cpp
