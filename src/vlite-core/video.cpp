@@ -88,8 +88,8 @@ namespace vlite {
                     // std::cout<<"frame: "<<f<<std::endl;
 
                     push_frame(std::move(f));
+                    frame_idx+=1;
                 }
-                frame_idx+=1;
             }
             av_packet_unref(pkt);
         }

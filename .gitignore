@@ -9,3 +9,4 @@ build
 output
 libtorch
 pyblind11/
+env/
