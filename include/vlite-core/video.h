@@ -3,6 +3,7 @@
 #include "frame.h"
 #include <iostream>
 #include <vector>
+#include <memory>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
