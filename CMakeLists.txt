@@ -7,17 +7,29 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Find LibTorch
 # Try to find torch from the build environment
 if(NOT DEFINED Torch_DIR)
+    # First, try to find Python if not already set
+    if(NOT DEFINED PYTHON_EXECUTABLE)
+        find_package(Python3 COMPONENTS Interpreter REQUIRED)
+        set(PYTHON_EXECUTABLE ${Python3_EXECUTABLE})
+    endif()
+
     # Use Python to find torch location
     execute_process(
         COMMAND ${PYTHON_EXECUTABLE} -c "import torch; print(torch.utils.cmake_prefix_path)"
         OUTPUT_VARIABLE TORCH_CMAKE_PATH
         OUTPUT_STRIP_TRAILING_WHITESPACE
         ERROR_QUIET
+        RESULT_VARIABLE TORCH_FIND_RESULT
     )
-    if(TORCH_CMAKE_PATH)
+
+    if(TORCH_FIND_RESULT EQUAL 0 AND TORCH_CMAKE_PATH)
+        message(STATUS "Found Torch at: ${TORCH_CMAKE_PATH}")
         set(CMAKE_PREFIX_PATH "${TORCH_CMAKE_PATH}")
+    else()
+        message(FATAL_ERROR "Could not find PyTorch. Please install: pip install torch")
     endif()
 endif()
+
 find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
