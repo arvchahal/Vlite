@@ -39,9 +39,11 @@ jobs:
     - name: Install Python dependencies
       run: |
         python -m pip install --upgrade pip
+        # Install build dependencies (needed for --no-isolation)
+        pip install "setuptools>=45,<70" wheel "cmake>=3.28" pybind11
         # Install CPU-only PyTorch to save disk space (CUDA version is 4GB+)
         pip install torch --index-url https://download.pytorch.org/whl/cpu
-        pip install build twine numpy pybind11
+        pip install build twine numpy
 
     - name: Install pybind11
       run: |
