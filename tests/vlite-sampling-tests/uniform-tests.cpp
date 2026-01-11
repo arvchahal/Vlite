@@ -5,12 +5,15 @@
 #include <gtest/gtest.h>
 #include <vlite-core/video.h>
 #include <vlite-sampling/uniform.h>
+#include <filesystem>
+#include <iostream>
 
 extern "C" {
 #include <libavutil/pixfmt.h>
 }
 
 TEST(UniformSamplerTest, BasicSampling) {
+    std::cout << "Current working directory: " << std::filesystem::current_path() << std::endl;
     vlite::Video video;
     ASSERT_TRUE(video.load("../test_files/test1.mp4", AV_PIX_FMT_RGB24));
     vlite::Uniform_Spacing_Sampler sampler;

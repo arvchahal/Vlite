@@ -6,12 +6,15 @@
 #include <vlite-core/video.h>
 #include <vlite-sampling/uniform.h>
 #include <vlite-tensor/tensor.h>
+#include <filesystem>
+#include <iostream>
 
 extern "C" {
 #include <libavutil/pixfmt.h>
 }
 
 TEST(TensorTest, FrameToTensor) {
+    std::cout << "Current working directory: " << std::filesystem::current_path() << std::endl;
     vlite::Video video;
     ASSERT_TRUE(video.load("../test_files/test1.mp4", AV_PIX_FMT_RGB24));
     auto tensor = vlite::frame_to_tensor(video[0], false);
