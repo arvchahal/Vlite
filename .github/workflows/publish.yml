@@ -48,7 +48,7 @@ jobs:
         git clone https://github.com/pybind/pybind11.git $HOME/libs/pybind11
 
     - name: Build package
-      run: python -m build
+      run: python -m build --no-isolation
 
     - name: Publish to TestPyPI
       if: github.event_name == 'workflow_dispatch'
