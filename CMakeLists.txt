@@ -5,7 +5,19 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # Find LibTorch
-set(CMAKE_PREFIX_PATH "${CMAKE_CURRENT_SOURCE_DIR}/env/lib/python3.12/site-packages/torch")
+# Try to find torch from the build environment
+if(NOT DEFINED Torch_DIR)
+    # Use Python to find torch location
+    execute_process(
+        COMMAND ${PYTHON_EXECUTABLE} -c "import torch; print(torch.utils.cmake_prefix_path)"
+        OUTPUT_VARIABLE TORCH_CMAKE_PATH
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+    if(TORCH_CMAKE_PATH)
+        set(CMAKE_PREFIX_PATH "${TORCH_CMAKE_PATH}")
+    endif()
+endif()
 find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
@@ -53,7 +65,24 @@ target_link_libraries(vlite PUBLIC
 
 # Python bindings with pybind11
 find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
-add_subdirectory($ENV{HOME}/libs/pybind11 ${CMAKE_BINARY_DIR}/pybind11)
+
+# Try to find pybind11 in various locations
+if(EXISTS "$ENV{HOME}/libs/pybind11/CMakeLists.txt")
+    add_subdirectory($ENV{HOME}/libs/pybind11 ${CMAKE_BINARY_DIR}/pybind11)
+else()
+    # Try to find it via Python
+    execute_process(
+        COMMAND ${PYTHON_EXECUTABLE} -c "import pybind11; print(pybind11.get_cmake_dir())"
+        OUTPUT_VARIABLE PYBIND11_CMAKE_DIR
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+        ERROR_QUIET
+    )
+    if(PYBIND11_CMAKE_DIR)
+        find_package(pybind11 CONFIG REQUIRED PATHS ${PYBIND11_CMAKE_DIR})
+    else()
+        message(FATAL_ERROR "pybind11 not found. Install with: pip install pybind11")
+    endif()
+endif()
 
 pybind11_add_module(vlite_python
     vlite-pybind/main.cpp

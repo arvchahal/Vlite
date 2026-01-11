@@ -1,0 +1,28 @@
+# Include necessary files for source distribution
+include README.md
+include LICENSE
+include pyproject.toml
+include CMakeLists.txt
+
+# Include all source code
+recursive-include src *.cpp *.h
+recursive-include include *.h *.hpp
+recursive-include vlite-pybind *.cpp *.h
+
+# Include tests
+recursive-include tests *.cpp *.py
+
+# Include examples
+recursive-include examples *.py *.md
+
+# Exclude build artifacts
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude __pycache__
+global-exclude *.so
+global-exclude *.dylib
+global-exclude *.dll
+prune build
+prune cmake-build-*
+prune .pytest_cache
+prune .github

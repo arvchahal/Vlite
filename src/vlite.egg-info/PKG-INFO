@@ -1,3 +1,38 @@
+Metadata-Version: 2.1
+Name: vlite
+Version: 0.1.0
+Summary: Modern C++20 video preprocessing SDK for machine learning
+Home-page: https://github.com/arvchahal/Vlite
+Author: Arnav Chahal
+Author-email: Arnav Chahal <chahalarnav123@gmail.com>
+License: MIT
+Project-URL: Homepage, https://github.com/arvchahal/Vlite
+Project-URL: Documentation, https://github.com/arvchahal/Vlite/wiki
+Project-URL: Repository, https://github.com/arvchahal/Vlite
+Project-URL: Bug Tracker, https://github.com/arvchahal/Vlite/issues
+Keywords: video,preprocessing,machine-learning,pytorch,ffmpeg,computer-vision
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Multimedia :: Video
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: C++
+Requires-Python: >=3.9
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: torch>=2.0.0
+Requires-Dist: numpy>=1.20.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0.0; extra == "dev"
+Requires-Dist: pytest-cov>=3.0.0; extra == "dev"
+Provides-Extra: examples
+Requires-Dist: pillow>=9.0.0; extra == "examples"
+
 # Vlite - Video Preprocessing SDK for Machine Learning
 
 A modern C++20 video preprocessing library designed specifically for machine learning workflows. Vlite provides a clean, minimal interface for loading videos, decoding frames, performing transformations, sampling, and converting directly into PyTorch tensors.
