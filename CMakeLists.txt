@@ -57,6 +57,9 @@ add_library(vlite STATIC
         src/vlite-tensor/tensor.cpp
 )
 
+# Enable Position Independent Code for static library (required for linking into shared library)
+set_target_properties(vlite PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
 # Build test executable
 add_executable(vlite-test src/vlite-core/video_loader.cpp)
 target_link_libraries(vlite-test vlite)
