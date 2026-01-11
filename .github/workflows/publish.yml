@@ -55,8 +55,11 @@ jobs:
     - name: Repair wheels with auditwheel (Linux)
       if: runner.os == 'Linux'
       run: |
-        pip install auditwheel
-        auditwheel repair dist/*linux*.whl --plat manylinux_2_17_x86_64 -w dist/
+        pip install auditwheel patchelf
+        # Show what platform tags are compatible
+        auditwheel show dist/*linux*.whl
+        # Let auditwheel auto-detect the appropriate manylinux tag
+        auditwheel repair dist/*linux*.whl -w dist/
         rm dist/*linux_x86_64.whl  # Remove the original non-manylinux wheel
         ls -lh dist/
 
